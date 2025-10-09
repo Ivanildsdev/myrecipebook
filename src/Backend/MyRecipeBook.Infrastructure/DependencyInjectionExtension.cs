@@ -1,9 +1,11 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using FluentMigrator.Runner;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using MyRecipeBook.Domain.Contracts.Repositories.User;
 using MyRecipeBook.Infrastructure.DataAccess;
 using MyRecipeBook.Infrastructure.DataAccess.Repositories;
+using MyRecipeBook.Infrastructure.Extensions;
 
 namespace MyRecipeBook.Infrastructure
 {
@@ -11,15 +13,16 @@ namespace MyRecipeBook.Infrastructure
     {
         public static void AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
         {
-            var connectionString = configuration.GetConnectionString("MyRecipeBookDb");
+            var connectionString = configuration.ConnectionString();
             AddDbContext(services, connectionString);
             AddRepositories(services);
+            AddFluentMigrator(services, configuration);
         }
 
         private static void AddRepositories(IServiceCollection services)
         {
             services.AddScoped<IUnitOfWork, UnitOfWork>();
-            services.AddScoped<IUserReadOnlyRepository,UserRepository>();
+            services.AddScoped<IUserReadOnlyRepository, UserRepository>();
             services.AddScoped<IUserWriteOnlyRepository, UserRepository>();
         }
 
@@ -39,7 +42,20 @@ namespace MyRecipeBook.Infrastructure
                                 errorNumbersToAdd: null);
                         }
                 );
-            } );
+            });
         }
+
+        private static void AddFluentMigrator(IServiceCollection services, IConfiguration configuration)
+        {
+            var connectionString = configuration.ConnectionString();
+
+            services.AddFluentMigratorCore()
+                .ConfigureRunner(rb => rb
+                .AddSqlServer()
+                .WithGlobalConnectionString(connectionString)
+                .ScanIn(typeof(DependencyInjectionExtension).Assembly).For.All());
+            //.AddLogging(lb => lb.AddFluentMigratorConsole());
+        }
+
     }
 }
