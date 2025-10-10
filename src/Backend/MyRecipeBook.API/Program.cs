@@ -2,6 +2,8 @@ using MyRecipeBook.API.Filters;
 using MyRecipeBook.API.Middleware;
 using MyRecipeBook.Infrastructure;
 using MyRecipeBook.Application;
+using MyRecipeBook.Infrastructure.Migrations;
+using MyRecipeBook.Infrastructure.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -14,7 +16,7 @@ builder.Services.AddMvc(options =>
     options.Filters.Add<ExceptionFilter>();
 });
 builder.Services.AddInfrastructure(builder.Configuration);
-builder.Services.AddApplication();
+builder.Services.AddApplication(builder.Configuration);
 
 var app = builder.Build();
 
@@ -32,4 +34,13 @@ app.UseAuthorization();
 
 app.MapControllers();
 
+MigrateDatabase();
+
 app.Run();
+
+void MigrateDatabase()
+{
+    var connectionString = builder.Configuration.ConnectionString();
+    var scope = app.Services.GetService<IServiceScopeFactory>().CreateScope();
+    DatabaseMigration.Migrate(connectionString, scope.ServiceProvider);
+}

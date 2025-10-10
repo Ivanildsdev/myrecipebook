@@ -30,13 +30,13 @@ namespace MyRecipeBook.Application.UseCases.User.Register
             _writeOnlyUserRepository = userWriteOnlyRepository;
             _unitOfWork = unitOfWork;
             _mapper = mapper;
-            _passwordEncripter = passwordEncripter ?? new PasswordEncripter();
+            _passwordEncripter = passwordEncripter;
         }
 
         public async Task<ResponseRegisterUserJson> Execute(
             RequestRegisterUserJson request)
         {
-            Validate(request);
+            await Validate(request);
 
             var user = _mapper.Map<Domain.Entities.User>(request);
 
@@ -46,7 +46,7 @@ namespace MyRecipeBook.Application.UseCases.User.Register
 
             await _unitOfWork.CommitAsync();
 
-            return new ResponseRegisterUserJson { Name = "" };
+            return new ResponseRegisterUserJson { Name = user.Name };
         }
 
         private async Task Validate(RequestRegisterUserJson request)
@@ -67,6 +67,7 @@ namespace MyRecipeBook.Application.UseCases.User.Register
             if (result.IsValid == false)
             {
                 var erroMessages = result.Errors.Select(x => x.ErrorMessage).ToList();
+
                 throw new ErrorOnValidationException(erroMessages);
             }
         }
