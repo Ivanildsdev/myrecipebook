@@ -2,11 +2,16 @@
 
 namespace MyRecipeBook.Infrastructure.Extensions
 {
-    public static class ConficurationExtension
+    public static class ConfigurationExtension
     {
         public static string ConnectionString(this IConfiguration configuration)
         {
             return configuration.GetConnectionString("MyRecipeBookDb")!;
+        }
+
+        public static bool IsUnitTestEnviroment(this IConfiguration configuration)
+        {
+            return configuration.GetValue<bool>("InMemoryTest");
         }
 
     }
