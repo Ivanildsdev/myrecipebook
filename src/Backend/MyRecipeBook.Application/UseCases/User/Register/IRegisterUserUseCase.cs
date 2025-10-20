@@ -5,6 +5,6 @@ namespace MyRecipeBook.Application.UseCases.User.Register
 {
     public interface IRegisterUserUseCase
     {
-        Task<ResponseRegisterUserJson> Execute(RequestRegisterUserJson request);
+        Task<ResponseRegisteredUserJson> Execute(RequestRegisterUserJson request);
     }
 }

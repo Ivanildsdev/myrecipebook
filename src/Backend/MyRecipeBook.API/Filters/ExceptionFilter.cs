@@ -14,21 +14,22 @@ namespace MyRecipeBook.API.Filters
             if (context.Exception is MyRecipeBookException)
                 HandleProjectException(context);
             else
-            {
-                // Log exception
-            }
+                ThrowUnknowException(context);
         }
 
         private void HandleProjectException(ExceptionContext context)
         {
-            // Handle project specific exceptions
-            if (context.Exception is ErrorOnValidationException)
+            if (context.Exception is InvalidLoginException)
             {
+                context.HttpContext.Response.StatusCode = (int)HttpStatusCode.Unauthorized;
+                context.Result = new UnauthorizedObjectResult(new ResponseErrorJson(context.Exception.Message));
+            }
+            else if (context.Exception is ErrorOnValidationException)
+            {
+                var exception = context.Exception as ErrorOnValidationException;
+
                 context.HttpContext.Response.StatusCode = (int)HttpStatusCode.BadRequest;
-                context.Result = new Microsoft.AspNetCore.Mvc.JsonResult(new
-                {
-                    Errors = ((ErrorOnValidationException)context.Exception).ErrorMessages
-                });
+                context.Result = new BadRequestObjectResult(new ResponseErrorJson(exception!.ErrorMessages));
             }
         }
 

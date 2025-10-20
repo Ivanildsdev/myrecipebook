@@ -8,7 +8,6 @@ namespace MyRecipeBook.Infrastructure.Migrations.Versions
     {
         protected ICreateTableColumnOptionOrWithColumnSyntax CreateTable(string tableName)
         {
-            // if (!Schema.Table(tableName).Exists())
             return Create.Table(tableName)
             .WithColumn("Id").AsInt64().PrimaryKey().Identity()
             .WithColumn("CreatedOn").AsDateTime().NotNullable()//.WithDefault(SystemMethods.CurrentUTCDateTime)

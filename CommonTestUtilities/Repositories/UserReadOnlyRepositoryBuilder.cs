@@ -1,5 +1,6 @@
 ﻿using Moq;
 using MyRecipeBook.Domain.Contracts.Repositories.User;
+using MyRecipeBook.Domain.Entities;
 
 namespace CommonTestUtilities.Repositories
 {
@@ -13,6 +14,12 @@ namespace CommonTestUtilities.Repositories
         {
             _repository.Setup(r => r.ExistActiveUserWithEmail(email))
                 .ReturnsAsync(true);
+        }
+
+        public void GetByEmailAndPassword(User user)
+        {
+            _repository.Setup(r => r.GetByEmailAndPassword(user.Email, user.Password))
+                .ReturnsAsync(user);
         }
 
         public IUserReadOnlyRepository Build() => _repository.Object;

@@ -11,12 +11,6 @@ namespace CommonTestUtilities.Requests
                 .RuleFor(u => u.Name, f => f.Name.FirstName())
                 .RuleFor(u => u.Email, (f, user) => f.Internet.Email(user.Name))
                 .RuleFor(u => u.Password, f => f.Internet.Password(passwordLength)).Generate();
-            //return new RequestRegisterUserJson
-            //{
-            //    Name = "Valid Name",
-            //    Email = "teste@test.com",
-            //    Password = "validPassword"
-            //};
         }
     }
 }

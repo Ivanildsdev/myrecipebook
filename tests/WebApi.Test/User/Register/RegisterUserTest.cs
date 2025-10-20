@@ -8,13 +8,11 @@ using WebApi.Test.InlineData;
 
 namespace WebApi.Test.User.Register
 {
-    public class RegisterUserTest : IClassFixture<CustomWebApplicationFactory>
+    public class RegisterUserTest : MyRecipeBookClassFixture
     {
-        private readonly HttpClient _client;
-        public RegisterUserTest(CustomWebApplicationFactory factory)
-        {
-            _client = factory.CreateClient();
-        }
+        private readonly string method = "User";
+
+        public RegisterUserTest(CustomWebApplicationFactory factory) : base(factory) { }
 
         [Fact]
         public async Task Success()
@@ -23,7 +21,7 @@ namespace WebApi.Test.User.Register
             var request = RequestRegisterUserJsonBuilder.Build();
             
             //act
-            var response = await _client.PostAsJsonAsync("User", request);
+            var response = await DoPost(method, request);
             
             //assert
             response.StatusCode.Should().Be(HttpStatusCode.Created);
@@ -41,8 +39,12 @@ namespace WebApi.Test.User.Register
                 .And
                 .Be(request.Name);
 
+            responseData.RootElement.GetProperty("tokens").GetProperty("accessToken").GetString()
+                .Should()
+                .NotBeNullOrEmpty();
+
         }
-        
+
         [Theory]
         [ClassData(typeof(CultureInlineDataTest))]
         public async Task Error_Empty_Name(string language)
@@ -50,13 +52,7 @@ namespace WebApi.Test.User.Register
             var request = RequestRegisterUserJsonBuilder.Build();
             request.Name = string.Empty;
 
-            if (_client.DefaultRequestHeaders.Contains("Accept-Language"))
-               _client.DefaultRequestHeaders.Remove("Accept-Language");
-
-            _client.DefaultRequestHeaders.Add("Accept-Language", language);
-
-            var response = await _client.PostAsJsonAsync("User", request);
-
+            var response = await DoPost(method, request, language);
             //assert
             response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
 

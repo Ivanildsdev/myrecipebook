@@ -3,9 +3,15 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using MyRecipeBook.Domain.Contracts.Repositories.User;
+using MyRecipeBook.Domain.Security.Tokens;
+using MyRecipeBook.Domain.Services.LoggedUser;
 using MyRecipeBook.Infrastructure.DataAccess;
 using MyRecipeBook.Infrastructure.DataAccess.Repositories;
 using MyRecipeBook.Infrastructure.Extensions;
+using MyRecipeBook.Infrastructure.Security.Tokens.Access.Generator;
+using MyRecipeBook.Infrastructure.Security.Tokens.Access.Validator;
+using MyRecipeBook.Infrastructure.Services.LoggedUser;
+using System.Reflection;
 
 namespace MyRecipeBook.Infrastructure
 {
@@ -14,6 +20,8 @@ namespace MyRecipeBook.Infrastructure
         public static void AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
         {
             AddRepositories(services);
+            AddLoggedUser(services);
+            AddTokens(services, configuration);
 
             if (configuration.IsUnitTestEnviroment())
                 return;
@@ -23,6 +31,8 @@ namespace MyRecipeBook.Infrastructure
             AddDbContext(services, connectionString);
             AddFluentMigrator(services, configuration);
         }
+
+        private static void AddLoggedUser(IServiceCollection services) => services.AddScoped<ILoggedUser, LoggedUser>();
 
         private static void AddRepositories(IServiceCollection services)
         {
@@ -55,11 +65,22 @@ namespace MyRecipeBook.Infrastructure
             var connectionString = configuration.ConnectionString();
 
             services.AddFluentMigratorCore()
-                .ConfigureRunner(rb => rb
+                .ConfigureRunner(options => options
                 .AddSqlServer()
                 .WithGlobalConnectionString(connectionString)
-                .ScanIn(typeof(DependencyInjectionExtension).Assembly).For.All());
+                .ScanIn(Assembly.Load("MyRecipeBook.Infrastructure")).For.All());
+                //.ScanIn(typeof(DependencyInjectionExtension).Assembly).For.All());
             //.AddLogging(lb => lb.AddFluentMigratorConsole());
+        }
+
+        private static void AddTokens(IServiceCollection services, IConfiguration configuration)
+        {
+            var signingKey = configuration.GetValue<string>("Settings:Jwt:SigningKey");
+            var expirationTimeMinutes = configuration.GetValue<uint>("Settings:Jwt:ExpirationMinutes");
+            
+            services.AddScoped<IAccessTokenGenerator>(option => new JwtTokenGenerator(expirationTimeMinutes, signingKey));
+            services.AddScoped<IAccessTokenValidator>(option => new JwtTokenValidator(signingKey!));
+
         }
 
     }

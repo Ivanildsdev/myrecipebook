@@ -88,6 +88,15 @@ namespace MyRecipeBook.Exceptions {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Invalid e-mail and/or password.
+        /// </summary>
+        public static string EMAIL_OR_PASSWORD_INVALID {
+            get {
+                return ResourceManager.GetString("EMAIL_OR_PASSWORD_INVALID", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Name is required.
         /// </summary>
         public static string NAME_EMPTY {
@@ -102,6 +111,15 @@ namespace MyRecipeBook.Exceptions {
         public static string NAME_LENGTH {
             get {
                 return ResourceManager.GetString("NAME_LENGTH", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Toke is Invalid or expired.
+        /// </summary>
+        public static string NO_TOKEN {
+            get {
+                return ResourceManager.GetString("NO_TOKEN", resourceCulture);
             }
         }
         
@@ -129,6 +147,15 @@ namespace MyRecipeBook.Exceptions {
         public static string UNNKNOW_ERROR {
             get {
                 return ResourceManager.GetString("UNNKNOW_ERROR", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to User don´t have permission to access this resource.
+        /// </summary>
+        public static string USER_WITHOUT_PERMISSION_ACCESS_RESOURCE {
+            get {
+                return ResourceManager.GetString("USER_WITHOUT_PERMISSION_ACCESS_RESOURCE", resourceCulture);
             }
         }
     }
