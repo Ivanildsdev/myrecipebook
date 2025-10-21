@@ -1,4 +1,5 @@
-﻿using System.Net.Http.Json;
+﻿using System.Net.Http.Headers;
+using System.Net.Http.Json;
 
 namespace WebApi.Test
 {
@@ -12,7 +13,22 @@ namespace WebApi.Test
         {   SetCulture(culture);
             return await _client.PostAsJsonAsync(method, request);
         }
-        
+
+        protected async Task<HttpResponseMessage> DoGet(string method, string token, string culture = "en")
+        {
+            SetCulture(culture);
+            AuthorizeRequest(token);
+            return await _client.GetAsync(method);
+        }
+
+        private void AuthorizeRequest(string token)
+        {
+            if (string.IsNullOrWhiteSpace(token))
+                return;
+
+            _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+        }
+
         private void SetCulture(string culture)
         {
             if (_client.DefaultRequestHeaders.Contains("Accept-Language"))

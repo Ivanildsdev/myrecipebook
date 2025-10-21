@@ -53,5 +53,7 @@ namespace WebApi.Test
             dbContext.Users.Add(_user);
             dbContext.SaveChanges();
         }
+
+        public Guid GetUserIdentifier() => _user.UserIdentifier;
     }
 }
