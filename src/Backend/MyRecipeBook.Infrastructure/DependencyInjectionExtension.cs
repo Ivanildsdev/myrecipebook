@@ -3,11 +3,13 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using MyRecipeBook.Domain.Contracts.Repositories.User;
+using MyRecipeBook.Domain.Security.Criptography;
 using MyRecipeBook.Domain.Security.Tokens;
 using MyRecipeBook.Domain.Services.LoggedUser;
 using MyRecipeBook.Infrastructure.DataAccess;
 using MyRecipeBook.Infrastructure.DataAccess.Repositories;
 using MyRecipeBook.Infrastructure.Extensions;
+using MyRecipeBook.Infrastructure.Security.Criptography;
 using MyRecipeBook.Infrastructure.Security.Tokens.Access.Generator;
 using MyRecipeBook.Infrastructure.Security.Tokens.Access.Validator;
 using MyRecipeBook.Infrastructure.Services.LoggedUser;
@@ -22,6 +24,7 @@ namespace MyRecipeBook.Infrastructure
             AddRepositories(services);
             AddLoggedUser(services);
             AddTokens(services, configuration);
+            AddEncripter(services, configuration);
 
             if (configuration.IsUnitTestEnviroment())
                 return;
@@ -39,6 +42,8 @@ namespace MyRecipeBook.Infrastructure
             services.AddScoped<IUnitOfWork, UnitOfWork>();
             services.AddScoped<IUserReadOnlyRepository, UserRepository>();
             services.AddScoped<IUserWriteOnlyRepository, UserRepository>();
+            services.AddScoped<IUserUpdateOnlyRepository, UserRepository>();
+            
         }
 
         private static void AddDbContext(IServiceCollection services, string connectionString)
@@ -83,5 +88,10 @@ namespace MyRecipeBook.Infrastructure
 
         }
 
+        private static void AddEncripter(IServiceCollection services, IConfiguration configuration)
+        {
+            var additionalKey = configuration.GetValue<string>("Settings:Password:AditionalKey");
+            services.AddScoped<IPasswordEncripter>(options => new Sha512Encripter(additionalKey));
+        }
     }
 }

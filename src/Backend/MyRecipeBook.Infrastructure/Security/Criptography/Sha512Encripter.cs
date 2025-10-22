@@ -1,12 +1,13 @@
-﻿using System.Security.Cryptography;
+﻿using MyRecipeBook.Domain.Security.Criptography;
+using System.Security.Cryptography;
 using System.Text;
 
-namespace MyRecipeBook.Application.Services.Criptography
+namespace MyRecipeBook.Infrastructure.Security.Criptography
 {
-    public class PasswordEncripter
+    public class Sha512Encripter : IPasswordEncripter
     {
         private readonly string _aditionalKey;
-        public PasswordEncripter(string aditionalKey)
+        public Sha512Encripter(string aditionalKey)
         {
             _aditionalKey = aditionalKey;
         }
@@ -25,7 +26,7 @@ namespace MyRecipeBook.Application.Services.Criptography
         {
             var sb = new StringBuilder();
             foreach (var b in hashBytes)
-            { 
+            {
                 var hex = b.ToString("x2");
                 sb.Append(hex);
             }
