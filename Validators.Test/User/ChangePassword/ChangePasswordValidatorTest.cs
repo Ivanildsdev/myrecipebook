@@ -5,7 +5,7 @@ using MyRecipeBook.Exceptions;
 
 namespace Validators.Test.User.Register
 {
-    public class RegisterUserValidatorTest
+    public class ChangePasswordValidatorTest
     {
         [Fact]
         public void Success()
